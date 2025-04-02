@@ -1,3 +1,5 @@
+import 'package:app2/screens/piping_worker/piping_orders.dart';
+import 'package:app2/screens/service_worker/services_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -15,33 +17,38 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
   void _login() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        bool isAuthenticated = await Provider.of<AuthProvider>(
-          context,
-          listen: false,
-        ).login(_loginIdController.text, _passwordController.text);
+  if (_formKey.currentState!.validate()) {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      bool isAuthenticated =
+          await authProvider.login(_loginIdController.text, _passwordController.text);
 
-        if (isAuthenticated) {
-          Navigator.pushReplacementNamed(
-            context,
-            '/services',
-          ); // ✅ Use named route
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Invalid login credentials"),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      } catch (e) {
+      if (isAuthenticated) {
+        // Redirect based on user role using actual class files
+        Widget nextPage = authProvider.userRole == "service_worker"
+            ? ServicesPage()  // File reference
+            : PipingOrders(); // File reference
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => nextPage),
+        );
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+          const SnackBar(
+            content: Text("Invalid login credentials"),
+            backgroundColor: Colors.red,
+          ),
         );
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+      );
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

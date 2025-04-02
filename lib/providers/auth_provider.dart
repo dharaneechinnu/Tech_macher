@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider with ChangeNotifier {
-  String? _userRole; // Store user role
-  bool _isAuthenticated = false; // Track login state
+  String? _userRole;
+  bool _isAuthenticated = false;
 
   String? get userRole => _userRole;
   bool get isAuthenticated => _isAuthenticated;
@@ -17,7 +17,7 @@ class AuthProvider with ChangeNotifier {
       _userRole = "piping_worker";
       _isAuthenticated = true;
     } else {
-      return false; // ✅ Return false instead of throwing an exception
+      return false;
     }
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -25,7 +25,7 @@ class AuthProvider with ChangeNotifier {
     await prefs.setBool("isAuthenticated", _isAuthenticated);
 
     notifyListeners();
-    return true; // ✅ Return true on successful login
+    return true;
   }
 
   // Logout function
@@ -47,5 +47,11 @@ class AuthProvider with ChangeNotifier {
     _isAuthenticated = prefs.getBool("isAuthenticated") ?? false;
 
     notifyListeners();
+  }
+
+  // Check if user is logged in
+  Future<bool> isLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool("isAuthenticated") ?? false;
   }
 }

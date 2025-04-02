@@ -5,6 +5,8 @@ import '../screens/service_worker/services_page.dart';
 import '../screens/piping_worker/piping_orders.dart';
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     String? role = Provider.of<AuthProvider>(context).userRole;
