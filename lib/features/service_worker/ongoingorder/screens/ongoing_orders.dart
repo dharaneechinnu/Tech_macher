@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/order_provider.dart';
+import '../../../../core/providers/order_provider.dart';
 
 class OngoingOrders extends StatelessWidget {
   const OngoingOrders({super.key});

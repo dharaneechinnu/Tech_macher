@@ -1,8 +1,8 @@
-import 'package:app2/screens/piping_worker/piping_orders.dart';
-import 'package:app2/screens/service_worker/services_page.dart';
+import 'package:app2/features/piping_worker/piping_orders.dart';
+import 'package:app2/features/service_worker/servicespage/screens/services_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/auth_provider.dart';
+import '../../../core/providers/auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

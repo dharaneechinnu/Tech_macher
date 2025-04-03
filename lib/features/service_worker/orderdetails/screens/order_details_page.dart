@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../models/order_model.dart';
-import '../../screens/service_worker/OrderProcessing.dart';
-import '../../screens/service_worker/widgets/order_detail_row.dart';
-import '../../screens/service_worker/widgets/order_checkbox.dart';
+import '../../../../core/models/order_model.dart';
+import '../../newservice/screens/OrderProcessing.dart';
+import '../widgets/order_detail_row.dart';
+import '../widgets/order_checkbox.dart';
 
 class OrderDetailsPage extends StatelessWidget {
   final OrderModel order;

@@ -1,10 +1,10 @@
-import 'package:app2/providers/order_provider.dart';
-import 'package:app2/screens/auth/login_page.dart';
+import 'package:app2/core/providers/order_provider.dart';
+import 'package:app2/features/auth/screens/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'new_service_orders.dart';
-import 'ongoing_orders.dart';
+import '../../newservice/screens/new_service_orders.dart';
+import '../../ongoingorder/screens/ongoing_orders.dart';
 
 class ServicesPage extends StatefulWidget {
   const ServicesPage({super.key});

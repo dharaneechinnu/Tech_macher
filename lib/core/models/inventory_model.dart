@@ -2,13 +2,15 @@ class InventoryItem {
   final String id;
   final String name;
   final String sku;
-  int quantity;
+  int availableQuantity; // Tracks stock available in vehicle
+  int usedQuantity; // Tracks how many are used
 
   InventoryItem({
     required this.id,
     required this.name,
     required this.sku,
-    required this.quantity,
+    required this.availableQuantity,
+    this.usedQuantity = 0, // Default to 0 if not provided
   });
 
   factory InventoryItem.fromJson(Map<String, dynamic> json) {
@@ -16,7 +18,8 @@ class InventoryItem {
       id: json['id'].toString(),
       name: json['name'].toString(),
       sku: json['sku'].toString(),
-      quantity: json['quantity'],
+      availableQuantity: (json['availableQuantity'] as int?) ?? 0, // ✅ Prevents null error
+      usedQuantity: (json['usedQuantity'] as int?) ?? 0, // ✅ Prevents null error
     );
   }
 
@@ -25,7 +28,8 @@ class InventoryItem {
       'id': id,
       'name': name,
       'sku': sku,
-      'quantity': quantity,
+      'availableQuantity': availableQuantity,
+      'usedQuantity': usedQuantity,
     };
   }
 }

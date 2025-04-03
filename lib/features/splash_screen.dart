@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/auth_provider.dart';
-import './auth/login_page.dart';
-import './piping_worker/piping_orders.dart';
-import './service_worker/services_page.dart';
+import '../core/providers/auth_provider.dart';
+import 'auth/screens/login_page.dart';
+import 'piping_worker/piping_orders.dart';
+import 'service_worker/servicespage/screens/services_page.dart';
 
 
 

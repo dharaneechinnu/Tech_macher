@@ -1,8 +1,8 @@
-import 'package:app2/screens/service_worker/order_details_page.dart';
+import 'package:app2/features/service_worker/orderdetails/screens/order_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/order_provider.dart';
-import '../../models/order_model.dart';
+import '../../../../core/providers/order_provider.dart';
+import '../../../../core/models/order_model.dart';
 
 class NewServiceOrders extends StatelessWidget {
   const NewServiceOrders({super.key});
@@ -38,8 +38,8 @@ class NewServiceOrders extends StatelessWidget {
                     builder:
                         (context) => OrderDetailsPage(
                           order: orderModel,
-                          changeMeter: false,
-                          newMeter: true,
+                          changeMeter: true,
+                          newMeter: false,
                         ),
                   ),
                 );
