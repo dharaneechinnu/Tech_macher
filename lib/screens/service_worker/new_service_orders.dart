@@ -36,8 +36,11 @@ class NewServiceOrders extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder:
-                        (context) =>
-                            OrderDetailsPage(order: orderModel), 
+                        (context) => OrderDetailsPage(
+                          order: orderModel,
+                          changeMeter: false,
+                          newMeter: true,
+                        ),
                   ),
                 );
               },

@@ -1,133 +1,161 @@
 import 'package:flutter/material.dart';
 import '../../models/order_model.dart';
+import '../../screens/service_worker/OrderProcessing.dart';
+import '../../screens/service_worker/widgets/order_detail_row.dart';
+import '../../screens/service_worker/widgets/order_checkbox.dart';
 
 class OrderDetailsPage extends StatelessWidget {
   final OrderModel order;
+  final bool changeMeter;
+  final bool newMeter;
 
-  const OrderDetailsPage({super.key, required this.order});
+  const OrderDetailsPage({
+    super.key,
+    required this.order,
+    required this.changeMeter,
+    required this.newMeter,
+  });
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width; // Get screen width
+    double screenHeight =
+        MediaQuery.of(context).size.height; // Get screen height
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Service Order Details',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          "Service Order Details",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.blue,
         iconTheme: const IconThemeData(color: Colors.white, size: 30),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Box with only Order Number
-            Container(
-              padding: const EdgeInsets.all(12),
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.grey.shade300,
-                ), // Light grey border
-                borderRadius: BorderRadius.circular(8),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Order Details Box
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.04),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade400),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Order Number (Big & Left Aligned)
+                    Text(
+                      "Order ID: ${order.orderNumber}",
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.06,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.01),
+
+                    // Remaining Order Details
+                    OrderDetailRow(label: "Priority", value: order.priority),
+                    OrderDetailRow(label: "Start Time", value: order.startTime),
+                    OrderDetailRow(label: "End Time", value: order.endTime),
+                    OrderDetailRow(
+                      label: "Customer",
+                      value: order.customerName,
+                    ),
+                    OrderDetailRow(label: "Phone", value: order.phoneNumber),
+                    OrderDetailRow(label: "Address", value: order.address),
+                  ],
+                ),
               ),
-              child: Center(
-                child: Text(
-                  "Order ID: ${order.orderNumber}",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+
+              SizedBox(height: screenHeight * 0.02),
+
+              // Service Order Remarks Box
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.04),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Service Order Remarks",
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.045,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.008),
+                    TextField(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                      readOnly: true,
+                      controller: TextEditingController(
+                        text: order.customerName,
+                      ),
+                      maxLines: 3,
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: screenHeight * 0.02),
+
+              // Checkboxes
+              OrderCheckbox(label: "Change Meter", value: changeMeter),
+              OrderCheckbox(label: "New Meter", value: newMeter),
+
+              SizedBox(height: screenHeight * 0.03),
+
+              // Responsive Start Work Button
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: screenWidth * 0.8, // 80% of screen width
+                    height: screenHeight * 0.07, // 7% of screen height
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => OrderProcessingPage(
+                                  order: order,
+                                  changeMeter: changeMeter,
+                                  newMeter: newMeter,
+                                ),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Start Work",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.045,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-
-            // Other order details (outside the box)
-            _buildDetailRow("Priority", order.priority),
-            _buildDetailRow("Start Time", order.startTime),
-            _buildDetailRow("End Time", order.endTime),
-            _buildDetailRow("Customer", order.customerName),
-            _buildDetailRow("Phone", order.phoneNumber),
-            _buildDetailRow("Address", order.address),
-
-            const SizedBox(height: 16),
-
-            // Service Order Remarks
-            const Text(
-              "Service Order Remarks",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue, // Changed color to blue
-              ),
-            ),
-            const TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: "Enter remarks here...",
-              ),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 16),
-
-            // Checkbox for "New Meter"
-            Row(
-              children: [
-                Checkbox(
-                  value: true,
-                  onChanged: (value) {},
-                  activeColor: Colors.blue, // Changed checkbox color to blue
-                ),
-                const Text("New Meter"),
-              ],
-            ),
-
-            const Spacer(),
-
-            // Start Work Button
-            SizedBox(
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 30),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue, // Background blue
-                    foregroundColor: Colors.white, // Text color white
-                  ),
-                  onPressed: () {
-                    // Action for Start Work button
-                  },
-                  child: const Text(
-                    "Start Work",
-                    style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Function to create detail rows
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              SizedBox(height: screenHeight * 0.02),
+            ],
           ),
-          Text(value, style: const TextStyle(fontSize: 16)),
-        ],
+        ),
       ),
     );
   }

@@ -1,11 +1,8 @@
 import 'package:app2/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:app2/screens/auth/login_page.dart';
-import 'package:app2/screens/service_worker/services_page.dart';
-import 'package:app2/screens/piping_worker/piping_orders.dart'; // Import Piping Page
+// Import Piping Page
 import 'package:provider/provider.dart';
 import 'package:app2/providers/order_provider.dart';
-import 'dart:async';
 import './screens/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensures Flutter initializes before running
