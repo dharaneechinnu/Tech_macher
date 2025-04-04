@@ -1,8 +1,10 @@
+import 'package:app2/core/providers/auth_provider.dart';
 import 'package:app2/core/providers/order_provider.dart';
 import 'package:app2/features/auth/screens/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../../newservice/screens/new_service_orders.dart';
 import '../../ongoingorder/screens/ongoing_orders.dart';
 
@@ -17,11 +19,25 @@ class _ServicesPageState extends State<ServicesPage> {
   int _selectedTab = 0;
   final TextEditingController _searchController = TextEditingController();
 
-  void _logout(BuildContext context) {
+  String servicemanName = '';
+  String servicemanCode = '';
+
+  void _logout(BuildContext context) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    await authProvider.logout();
+    Hive.box('userBox').clear(); // Clear local storage on logout
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final userBox = Hive.box('userBox');
+    servicemanName = userBox.get('servicemanName', defaultValue: 'Serviceman');
+    servicemanCode = userBox.get('servicemanCode', defaultValue: '');
   }
 
   @override
@@ -37,21 +53,20 @@ class _ServicesPageState extends State<ServicesPage> {
           children: [
             UserAccountsDrawerHeader(
               decoration: const BoxDecoration(color: Colors.blue),
-              accountName: const Text(
-                "John Doe",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              accountName: Text(
+                servicemanName,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              accountEmail: const Text("johndoe@example.com"),
-              currentAccountPicture: const CircleAvatar(
-                //Add profile picture here
-              ),
+              accountEmail: const Text(""),
+              currentAccountPicture: const CircleAvatar(),
             ),
             ListTile(
               leading: const Icon(Icons.person, color: Colors.black, size: 30),
               title: const Text("Profile", style: TextStyle(fontSize: 18)),
-              onTap: () {
-                Navigator.pop(context);
-              },
+              onTap: () => Navigator.pop(context),
             ),
             ListTile(
               leading: const Icon(
@@ -60,9 +75,7 @@ class _ServicesPageState extends State<ServicesPage> {
                 size: 30,
               ),
               title: const Text("Settings", style: TextStyle(fontSize: 18)),
-              onTap: () {
-                Navigator.pop(context);
-              },
+              onTap: () => Navigator.pop(context),
             ),
             const Spacer(),
             Padding(
@@ -80,27 +93,26 @@ class _ServicesPageState extends State<ServicesPage> {
           ],
         ),
       ),
-
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Service Dashboard",
-              style: TextStyle(
+            Text(
+              servicemanName,
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
             ),
             Text(
+              'Service Code: $servicemanCode',
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+            ),
+            Text(
               currentDate,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 12),
             ),
           ],
         ),
@@ -114,62 +126,8 @@ class _ServicesPageState extends State<ServicesPage> {
                 color: Colors.white,
                 child: Row(
                   children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => _selectedTab = 0),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          curve: Curves.easeInOut,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color:
-                                _selectedTab == 0 ? Colors.white : Colors.blue,
-                            border: const Border(
-                              bottom: BorderSide(color: Colors.white, width: 0),
-                            ),
-                          ),
-                          child: Text(
-                            "New Service Orders",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color:
-                                  _selectedTab == 0
-                                      ? Colors.blue
-                                      : Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => _selectedTab = 1),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color:
-                                _selectedTab == 1 ? Colors.white : Colors.blue,
-                            border: const Border(
-                              bottom: BorderSide(color: Colors.white, width: 0),
-                            ),
-                          ),
-                          child: Text(
-                            "Ongoing",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color:
-                                  _selectedTab == 1
-                                      ? Colors.blue
-                                      : Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    buildTab("New Service Orders", 0),
+                    buildTab("Ongoing", 1),
                   ],
                 ),
               ),
@@ -201,8 +159,6 @@ class _ServicesPageState extends State<ServicesPage> {
           Expanded(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
-              switchInCurve: Curves.easeInOut,
-              switchOutCurve: Curves.easeInOut,
               child:
                   _selectedTab == 0
                       ? const NewServiceOrders()
@@ -210,6 +166,29 @@ class _ServicesPageState extends State<ServicesPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget buildTab(String label, int index) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedTab = index),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: _selectedTab == index ? Colors.white : Colors.blue,
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: _selectedTab == index ? Colors.blue : Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       ),
     );
   }

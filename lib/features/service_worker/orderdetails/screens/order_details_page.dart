@@ -94,9 +94,7 @@ class OrderDetailsPage extends StatelessWidget {
                         border: OutlineInputBorder(),
                       ),
                       readOnly: true,
-                      controller: TextEditingController(
-                        text: order.customerName,
-                      ),
+                      controller: TextEditingController(text: order.remarks),
                       maxLines: 3,
                     ),
                   ],
