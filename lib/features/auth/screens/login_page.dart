@@ -15,53 +15,40 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _loginIdController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
 
   void _login() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+  if (_formKey.currentState!.validate()) {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      bool isAuthenticated =
+          await authProvider.login(_loginIdController.text, _passwordController.text);
 
-      try {
-        final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        final loginId = _loginIdController.text.trim();
-        final password = _passwordController.text;
+      if (isAuthenticated) {
+        // Redirect based on user role using actual class files
+        Widget nextPage = authProvider.userRole == "service_worker"
+            ? ServicesPage()  // File reference
+            : PipingOrders(); // File reference
 
-        // Debug print - remove before production
-        print("Logging in with -> Username: $loginId | Password: $password");
-
-        bool isAuthenticated = await authProvider.login(loginId, password);
-
-        if (isAuthenticated) {
-          Widget nextPage =
-              authProvider.userRole == "service_worker"
-                  ? ServicesPage()
-                  : PipingOrders();
-
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => nextPage),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Invalid login credentials"),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => nextPage),
         );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Invalid login credentials"),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+      );
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -94,79 +81,75 @@ class _LoginPageState extends State<LoginPage> {
             flex: 3,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 20),
-                    const Text(
-                      "Hello Welcome👋",
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Hello Welcome👋",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(height: 20),
-                    Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            controller: _loginIdController,
-                            keyboardType: TextInputType.text,
-                            decoration: const InputDecoration(
-                              labelText: "Login ID",
-                              border: InputBorder.none,
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your login ID';
-                              }
-                              return null;
-                            },
+                  ),
+                  const SizedBox(height: 20),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _loginIdController,
+                          keyboardType: TextInputType.text,
+                          decoration: const InputDecoration(
+                            labelText: "Login ID",
+                            border: InputBorder.none,
                           ),
-                          const Divider(),
-                          const SizedBox(height: 20),
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: true,
-                            decoration: const InputDecoration(
-                              labelText: "Password",
-                              border: InputBorder.none,
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your password';
-                              }
-                              return null;
-                            },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your login ID';
+                            }
+                            return null;
+                          },
+                        ),
+                        const Divider(),
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          controller: _passwordController,
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                            labelText: "Password",
+                            border: InputBorder.none,
                           ),
-                          const Divider(),
-                          const SizedBox(height: 24),
-                          _isLoading
-                              ? const CircularProgressIndicator()
-                              : ElevatedButton(
-                                onPressed: _login,
-                                style: ElevatedButton.styleFrom(
-                                  minimumSize: const Size(double.infinity, 50),
-                                  elevation: 0,
-                                  backgroundColor: Colors.blue,
-                                ),
-                                child: const Text(
-                                  "Login",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              ),
-                        ],
-                      ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your Password';
+                            }
+                            return null;
+                          },
+                        ),
+                        const Divider(),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: _login,
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 50),
+                            elevation: 0,
+                            backgroundColor: Colors.blue,
+                          ),
+                          child: const Text(
+                            "Login",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

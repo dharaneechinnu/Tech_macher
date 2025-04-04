@@ -68,12 +68,4 @@ class InventoryProvider with ChangeNotifier {
     _selectedItems.removeWhere((item) => item.id == itemId);
     notifyListeners();
   }
-  
- void setSelectedItem(String itemId, String sku) {
-  _selectedItems.clear(); // If only one item should be selected
-  _selectedItems.add(InventoryItem(id: itemId, sku: sku, name: '', availableQuantity: 0, usedQuantity: 0));
-  notifyListeners();
-}
-
-
 }

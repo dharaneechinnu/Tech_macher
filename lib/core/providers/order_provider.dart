@@ -9,7 +9,6 @@ class Order {
   final String customerName;
   final String phoneNumber;
   final String address;
-  final String remarks;
   final bool isOngoing; // Determines if it's ongoing or new
 
   Order({
@@ -20,7 +19,6 @@ class Order {
     required this.customerName,
     required this.phoneNumber,
     required this.address,
-    required this.remarks,
     required this.isOngoing,
   });
 }
@@ -34,7 +32,6 @@ class OrderProvider with ChangeNotifier {
       endTime: "12:00 PM",
       customerName: "John Doe",
       phoneNumber: "9876543210",
-      remarks: "Change meter",
       address: "123 Street, City",
     ),
     OrderModel(
@@ -44,7 +41,6 @@ class OrderProvider with ChangeNotifier {
       endTime: "4:00 PM",
       customerName: "Jane Smith",
       phoneNumber: "8765432109",
-      remarks: "Change meter",
       address: "456 Avenue, City",
     ),
   ];
@@ -57,7 +53,6 @@ class OrderProvider with ChangeNotifier {
       endTime: "11:00 AM",
       customerName: "Alice Johnson",
       phoneNumber: "7654321098",
-      remarks: "Change meter",
       address: "789 Boulevard, City",
     ),
     OrderModel(
@@ -67,7 +62,6 @@ class OrderProvider with ChangeNotifier {
       endTime: "5:00 PM",
       customerName: "Bob Williams",
       phoneNumber: "6543210987",
-      remarks: "Change meter",
       address: "321 Lane, City",
     ),
   ];
@@ -97,7 +91,6 @@ class OrderProvider with ChangeNotifier {
               customerName: order.customerName,
               phoneNumber: order.phoneNumber,
               address: order.address,
-              remarks: order.remarks, // Added remarks here
               isOngoing: false,
             ),
           )
@@ -121,7 +114,6 @@ class OrderProvider with ChangeNotifier {
               customerName: order.customerName,
               phoneNumber: order.phoneNumber,
               address: order.address,
-              remarks: order.remarks, // Added remarks here
               isOngoing: true,
             ),
           )

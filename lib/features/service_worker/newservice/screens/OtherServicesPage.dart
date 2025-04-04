@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 class OtherServicesPage extends StatelessWidget {
-  const OtherServicesPage({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -30,7 +30,6 @@ class NewServiceOrders extends StatelessWidget {
                   customerName: order.customerName,
                   phoneNumber: order.phoneNumber,
                   address: order.address,
-                  remarks: order.remarks
                 );
 
                 Navigator.push(

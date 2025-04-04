@@ -5,6 +5,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart'; // 👈 Add this
 
 import 'package:app2/core/providers/auth_provider.dart';
 import 'package:app2/core/providers/inventory_provider.dart';
+import 'package:flutter/material.dart';
+// Import Piping Page
+import 'package:provider/provider.dart';
 import 'package:app2/core/providers/order_provider.dart';
 import 'package:app2/features/splash_screen.dart';
 
@@ -26,7 +29,7 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => OrderProvider()),
         ChangeNotifierProvider(create: (context) => AuthProvider()),
-        ChangeNotifierProvider(create: (context) => InventoryProvider()),
+         ChangeNotifierProvider(create: (context) => InventoryProvider()),
       ],
       child: const MyApp(),
     ),

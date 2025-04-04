@@ -1,4 +1,3 @@
-import 'package:app2/core/models/inventory_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/models/order_model.dart';
@@ -25,16 +24,6 @@ class OrderProcessingPage extends StatefulWidget {
 }
 
 class _OrderProcessingPageState extends State<OrderProcessingPage> {
-  String? selectedItemId;
-  String? selectedItemSKU;
-
-  void _updateSelectedItem(String itemId, String itemSKU) {
-    setState(() {
-      selectedItemId = itemId;
-      selectedItemSKU = itemSKU;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final inventoryProvider = Provider.of<InventoryProvider>(
@@ -46,38 +35,25 @@ class _OrderProcessingPageState extends State<OrderProcessingPage> {
       appBar: AppBar(
         title: const Text(
           "Service Order Details",
-          style: TextStyle(color: Colors.white, fontSize: 16),
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
         children: [
-          OrderDetailsBox(order: widget.order),
+          OrderDetailsBox(order: widget.order), // ✅ Order Details Section
           Expanded(
             child: DefaultTabController(
               length: 3,
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: TabBar(
-                      labelStyle: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      labelColor: Colors.blue,
-                      unselectedLabelColor: Colors.black,
-                      indicatorSize: TabBarIndicatorSize.label,
-                      indicator: UnderlineTabIndicator(
-                        borderSide: BorderSide(width: 3.0, color: Colors.blue),
-                      ),
-                      tabs: const [
-                        Tab(text: "Meter Service"),
-                        Tab(text: "Other Services"),
-                        Tab(text: "Return"),
-                      ],
-                    ),
+                  const TabBar(
+                    tabs: [
+                      Tab(text: "Meter Service"),
+                      Tab(text: "Other Services"),
+                      Tab(text: "Return"),
+                    ],
                   ),
                   Expanded(
                     child: TabBarView(
@@ -100,134 +76,110 @@ class _OrderProcessingPageState extends State<OrderProcessingPage> {
     );
   }
 
+  // ✅ Change Meter UI
   Widget _buildChangeMeterView() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(12.0),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 10),
           _buildDetailRow("Old Meter ID (Serial num)", "TEST1401"),
-          _buildDetailRow("Old Meter Item code (SKU)", "SKU"),
+          _buildDetailRow("Old Meter Item code (SKU)", " SKU "),
           _buildTextField("Old Meter Reading", "00"),
+          const SizedBox(height: 10),
           _buildNewMeterSection(),
           _buildTextField("New Meter Reading", "00"),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildPreviewButton(),
         ],
       ),
     );
   }
 
+  // ✅ New Meter UI
   Widget _buildNewMeterView() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(12.0),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildNewMeterSection(),
           _buildTextField("New Meter Reading", "00"),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildPreviewButton(),
         ],
       ),
     );
   }
 
+  // ✅ Common UI for New Meter ID with Add Button
   Widget _buildNewMeterSection() {
-    return Consumer<InventoryProvider>(
-      builder: (context, inventoryProvider, child) {
-        List<InventoryItem> usedItems = inventoryProvider.selectedItems;
-
-        return Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "New Meter ID",
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    usedItems.isNotEmpty ? usedItems.first.id : "Not Selected",
-                    style: const TextStyle(color: Colors.blue),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    "New Meter SKU",
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    usedItems.isNotEmpty ? usedItems.first.sku : "Not Selected",
-                    style: const TextStyle(color: Colors.blue),
-                  ),
-                ],
-              ),
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.add_circle_outline,
-                color: Colors.blue,
-                size: 20,
-              ),
-              onPressed: () async {
-                final result = await showDialog(
-                  context: context,
-                  builder: (context) => InventoryPopup(),
-                );
-                if (result != null && result is Map<String, String>) {
-                  inventoryProvider.addToSelectedItems(result['itemId']!);
-                }
-              },
-            ),
-          ],
-        );
-      },
+    return Row(
+      children: [
+        const Expanded(
+          child: Text(
+            "New Meter ID",
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.add_circle_outline, color: Colors.blue),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => const InventoryPopup(),
+            );
+          },
+        ),
+      ],
     );
   }
 
+  // ✅ Common UI for Text Fields
   Widget _buildTextField(String label, String hint) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 5),
         TextField(
           decoration: InputDecoration(
             hintText: hint,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 8,
+              horizontal: 12,
+              vertical: 10,
             ),
           ),
           keyboardType: TextInputType.number,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
       ],
     );
   }
 
+  // ✅ Common UI for Detail Rows (Old Meter ID, SKU, etc.)
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
           Expanded(
             flex: 2,
             child: Text(
               label,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
             flex: 1,
             child: Text(
               value,
-              style: const TextStyle(fontSize: 13, color: Colors.blue),
+              style: const TextStyle(fontSize: 14, color: Colors.blue),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
@@ -237,17 +189,26 @@ class _OrderProcessingPageState extends State<OrderProcessingPage> {
     );
   }
 
+  // ✅ Preview Button
   Widget _buildPreviewButton() {
     return Center(
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          padding: const EdgeInsets.symmetric(vertical: 12),
-        ),
-        onPressed: () {},
-        child: const Text(
-          "Preview",
-          style: TextStyle(color: Colors.white, fontSize: 14),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          onPressed: () {
+            // Add functionality for preview
+          },
+          child: const Text(
+            "Preview",
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
         ),
       ),
     );
