@@ -5,7 +5,7 @@ import '../widgets/order_detail_row.dart';
 import '../widgets/order_checkbox.dart';
 
 class OrderDetailsPage extends StatelessWidget {
-  final OrderModel order;
+  final CustomerServiceOrder order;
   final bool changeMeter;
   final bool newMeter;
 
@@ -49,7 +49,7 @@ class OrderDetailsPage extends StatelessWidget {
                   children: [
                     // Order Number (Big & Left Aligned)
                     Text(
-                      "Order ID: ${order.orderNumber}",
+                      "Order ID: ${order.docNo}",
                       style: TextStyle(
                         fontSize: screenWidth * 0.06,
                         fontWeight: FontWeight.bold,
@@ -59,15 +59,15 @@ class OrderDetailsPage extends StatelessWidget {
                     SizedBox(height: screenHeight * 0.01),
 
                     // Remaining Order Details
-                    OrderDetailRow(label: "Priority", value: order.priority),
-                    OrderDetailRow(label: "Start Time", value: order.startTime),
-                    OrderDetailRow(label: "End Time", value: order.endTime),
+                    OrderDetailRow(label: "Priority", value: order.priorityLevel),
+                    OrderDetailRow(label: "Start Time", value: order.documentDate),
+                    OrderDetailRow(label: "End Time", value: order.documentDate),
                     OrderDetailRow(
                       label: "Customer",
                       value: order.customerName,
                     ),
-                    OrderDetailRow(label: "Phone", value: order.phoneNumber),
-                    OrderDetailRow(label: "Address", value: order.address),
+                    OrderDetailRow(label: "Phone", value: order.contactNo),
+                    OrderDetailRow(label: "Address", value: order.customerAddress),
                   ],
                 ),
               ),

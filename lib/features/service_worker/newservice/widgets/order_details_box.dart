@@ -3,7 +3,7 @@ import '../../../../core/models/order_model.dart';
 import 'info_row.dart';
 
 class OrderDetailsBox extends StatelessWidget {
-  final OrderModel order;
+  final CustomerServiceOrder order;
 
   const OrderDetailsBox({super.key, required this.order});
 
@@ -30,13 +30,13 @@ class OrderDetailsBox extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InfoRow(icon: Icons.receipt_long, label: "Order ID", value: order.orderNumber),
+            InfoRow(icon: Icons.receipt_long, label: "Order ID", value: order.docNo),
             InfoRow(icon: Icons.person, label: "Customer", value: order.customerName),
-            InfoRow(icon: Icons.priority_high, label: "Priority", value: order.priority),
-            InfoRow(icon: Icons.timer, label: "Start Time", value: order.startTime),
-            InfoRow(icon: Icons.timer_off, label: "End Time", value: order.endTime),
-            InfoRow(icon: Icons.phone, label: "Phone", value: order.phoneNumber),
-            InfoRow(icon: Icons.location_on, label: "Address", value: order.address),
+            InfoRow(icon: Icons.priority_high, label: "Priority", value: order.priorityLevel),
+            InfoRow(icon: Icons.timer, label: "Start Time", value: order.documentDate),
+            InfoRow(icon: Icons.timer_off, label: "End Time", value: order.documentDate),
+            InfoRow(icon: Icons.phone, label: "Phone", value: order.contactNo),
+            InfoRow(icon: Icons.location_on, label: "Address", value: order.customerAddress),
           ],
         ),
       ),

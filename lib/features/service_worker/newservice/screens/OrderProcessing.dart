@@ -8,7 +8,7 @@ import 'OtherServicesPage.dart';
 import 'ReturnPage.dart';
 
 class OrderProcessingPage extends StatefulWidget {
-  final OrderModel order;
+  final CustomerServiceOrder order;
   final bool changeMeter;
   final bool newMeter;
 

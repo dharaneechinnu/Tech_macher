@@ -1,32 +1,43 @@
-class OrderModel {
-  final String orderNumber;
-  final String priority;
-  final String startTime;
-  final String endTime;
+class CustomerServiceOrder {
+  final String docNo;
+  final String documentDate;
+  final String priorityLevel;
+  final String customerNo;
+  final String contactNo;
+  final String customerAddress2;
+  final String customerAddress;
   final String customerName;
-  final String phoneNumber;
-  final String address;
+  final String description;
+  final String serviceStatus;
 
-  OrderModel({
-    required this.orderNumber,
-    required this.priority,
-    required this.startTime,
-    required this.endTime,
+  CustomerServiceOrder({
+    required this.docNo,
+    required this.documentDate,
+    required this.priorityLevel,
+    required this.customerNo,
+    required this.contactNo,
+    required this.customerAddress2,
+    required this.customerAddress,
     required this.customerName,
-    required this.phoneNumber,
-    required this.address,
+    required this.description,
+    required this.serviceStatus,
   });
 
-  // Factory Constructor to create an OrderModel from JSON
-  factory OrderModel.fromJson(Map<String, dynamic> json) {
-    return OrderModel(
-      orderNumber: json['orderNumber']?.toString() ?? "Unknown", // Ensure String
-      priority: json['priority']?.toString() ?? "Normal",
-      startTime: json['startTime']?.toString() ?? "00:00 AM",
-      endTime: json['endTime']?.toString() ?? "00:00 AM",
-      customerName: json['customerName']?.toString() ?? "Unknown",
-      phoneNumber: json['phoneNumber']?.toString() ?? "0000000000",
-      address: json['address']?.toString() ?? "No Address",
+  factory CustomerServiceOrder.fromJson(Map<String, dynamic> json) {
+    return CustomerServiceOrder(
+      docNo: json['doc_no'] ?? '',
+      documentDate: json['document_date'] ?? '',
+      priorityLevel: json['priority_level'] ?? '',
+      customerNo: json['customer_no'] ?? '',
+      contactNo: json['contact_no'] ?? '',
+      customerAddress2: json['customer_address_2'] ?? '',
+      customerAddress: json['customer_address'] ?? '',
+      customerName: json['customer_name'] ?? '',
+      description: json['description'] ?? '',
+      serviceStatus: json['service_status'] ?? '',
     );
   }
+
+  bool get isNew => serviceStatus.trim().isEmpty;
+  bool get isOngoing => serviceStatus.trim().isNotEmpty;
 }

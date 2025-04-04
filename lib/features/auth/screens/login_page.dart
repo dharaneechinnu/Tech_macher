@@ -17,38 +17,62 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
   void _login() async {
-  if (_formKey.currentState!.validate()) {
-    try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      bool isAuthenticated =
-          await authProvider.login(_loginIdController.text, _passwordController.text);
+    debugPrint("Login button pressed"); // 🔥 Check if login function is called
 
-      if (isAuthenticated) {
-        // Redirect based on user role using actual class files
-        Widget nextPage = authProvider.userRole == "service_worker"
-            ? ServicesPage()  // File reference
-            : PipingOrders(); // File reference
+    final loginId = _loginIdController.text.trim();
+    final password = _passwordController.text.trim();
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => nextPage),
-        );
-      } else {
+    if (loginId.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter both login ID and password"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (_formKey.currentState!.validate()) {
+      try {
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+        debugPrint(
+          "Attempting login with: $loginId, $password",
+        ); // 🔥 Debug credentials
+
+        bool isAuthenticated = await authProvider.login(loginId, password);
+
+        debugPrint("Login success: $isAuthenticated");
+
+        if (isAuthenticated) {
+          Widget nextPage =
+              authProvider.userRole == "service_worker"
+                  ? const ServicesPage()
+                  : const PipingOrders();
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => nextPage),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Invalid login credentials"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        debugPrint("Login error: $e"); // 🔥 Print error
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Invalid login credentials"),
+          SnackBar(
+            content: Text("Login failed: ${e.toString()}"),
             backgroundColor: Colors.red,
           ),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
-      );
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {

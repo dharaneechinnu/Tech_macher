@@ -1,88 +1,119 @@
-import 'package:app2/features/service_worker/orderdetails/screens/order_details_page.dart';
+import 'package:app2/core/providers/order_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/providers/order_provider.dart';
-import '../../../../core/models/order_model.dart';
+import 'package:app2/features/service_worker/orderdetails/screens/order_details_page.dart';
 
-class NewServiceOrders extends StatelessWidget {
+class NewServiceOrders extends StatefulWidget {
   const NewServiceOrders({super.key});
 
   @override
+  State<NewServiceOrders> createState() => _NewServiceOrdersState();
+}
+
+class _NewServiceOrdersState extends State<NewServiceOrders> {
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<CustomerServiceProvider>(
+      context,
+      listen: false,
+    ).fetchServiceOrdersFromAPI();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final orders = Provider.of<OrderProvider>(context).newServiceOrders;
+    final orders = Provider.of<CustomerServiceProvider>(context).newOrders;
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 25),
-      child: Scaffold(
-        body: ListView.builder(
-          itemCount: orders.length,
-          itemBuilder: (context, index) {
-            final order = orders[index];
+    final userBox = Hive.box('userBox');
+    final servicemanName = userBox.get(
+      'servicemanName',
+      defaultValue: 'Unknown',
+    );
+    final servicemanCode = userBox.get('servicemanCode', defaultValue: 'N/A');
 
-            return GestureDetector(
-              onTap: () {
-                // Convert Order to OrderModel before passing it
-                final orderModel = OrderModel(
-                  orderNumber: order.orderNumber,
-                  priority: order.priority,
-                  startTime: order.startTime,
-                  endTime: order.endTime,
-                  customerName: order.customerName,
-                  phoneNumber: order.phoneNumber,
-                  address: order.address,
-                );
+    return Scaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Orders List
+          Expanded(
+            child:
+                orders.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                      itemCount: orders.length,
+                      itemBuilder: (context, index) {
+                        final order = orders[index];
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) => OrderDetailsPage(
-                          order: orderModel,
-                          changeMeter: true,
-                          newMeter: false,
-                        ),
-                  ),
-                );
-              },
-              child: Card(
-                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Order #${order.orderNumber}",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => OrderDetailsPage(
+                                      order: order,
+                                      changeMeter: true,
+                                      newMeter: false,
+                                    ),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 16,
+                            ),
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Order #${order.docNo}",
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      _priorityBadge(order.priorityLevel),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  _iconText(
+                                    Icons.access_time,
+                                    "Start: ${order.documentDate}",
+                                  ),
+                                  _iconText(
+                                    Icons.access_time,
+                                    "End: ${order.documentDate}",
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _iconText(Icons.person, order.customerName),
+                                  _iconText(Icons.phone, order.contactNo),
+                                  _iconText(
+                                    Icons.location_on,
+                                    order.customerAddress,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          _priorityBadge(order.priority),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      _iconText(Icons.access_time, "Start: ${order.startTime}"),
-                      _iconText(Icons.access_time, "End: ${order.endTime}"),
-                      const SizedBox(height: 10),
-                      _iconText(Icons.person, order.customerName),
-                      _iconText(Icons.phone, order.phoneNumber),
-                      _iconText(Icons.location_on, order.address),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
+                        );
+                      },
+                    ),
+          ),
+        ],
       ),
     );
   }

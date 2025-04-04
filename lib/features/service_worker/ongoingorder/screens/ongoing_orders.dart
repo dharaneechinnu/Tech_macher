@@ -7,7 +7,24 @@ class OngoingOrders extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final orders = Provider.of<OrderProvider>(context).ongoingOrders;
+    final orders = Provider.of<CustomerServiceProvider>(context).ongoingOrders;
+
+    if (orders.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(Icons.inbox, size: 60, color: Colors.grey),
+            SizedBox(height: 12),
+            Text(
+              "No ongoing service orders available.",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
 
     return ListView.builder(
       itemCount: orders.length,
@@ -30,22 +47,22 @@ class OngoingOrders extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Order #${order.orderNumber}",
+                      "Order #${order.docNo}",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
                     ),
-                    _priorityBadge(order.priority),
+                    _priorityBadge(order.priorityLevel),
                   ],
                 ),
 
                 const SizedBox(height: 12),
 
                 // Order Timing
-                _iconText(Icons.access_time, "Start: ${order.startTime}"),
-                _iconText(Icons.access_time, "End: ${order.endTime}"),
+                _iconText(Icons.access_time, "Start: ${order.documentDate}"),
+                _iconText(Icons.access_time, "End: ${order.documentDate}"),
 
                 const SizedBox(height: 10),
                 const Divider(height: 1, thickness: 1),
@@ -54,8 +71,8 @@ class OngoingOrders extends StatelessWidget {
 
                 // Customer Details
                 _iconText(Icons.person, order.customerName),
-                _iconText(Icons.phone, order.phoneNumber),
-                _iconText(Icons.location_on, order.address),
+                _iconText(Icons.phone, order.contactNo),
+                _iconText(Icons.location_on, order.customerAddress),
               ],
             ),
           ),

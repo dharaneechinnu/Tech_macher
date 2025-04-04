@@ -1,121 +1,81 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../models/order_model.dart';
+import 'package:dio/dio.dart';
 
-class Order {
-  final String orderNumber;
-  final String priority;
-  final String startTime;
-  final String endTime;
-  final String customerName;
-  final String phoneNumber;
-  final String address;
-  final bool isOngoing; // Determines if it's ongoing or new
+import 'package:app2/core/models/order_model.dart';
+import 'package:app2/core/services/network_services.dart';
 
-  Order({
-    required this.orderNumber,
-    required this.priority,
-    required this.startTime,
-    required this.endTime,
-    required this.customerName,
-    required this.phoneNumber,
-    required this.address,
-    required this.isOngoing,
-  });
-}
+class CustomerServiceProvider with ChangeNotifier {
+  final Dio _dio = Dio();
+  final NetworkService _networkService = NetworkService();
 
-class OrderProvider with ChangeNotifier {
-  final List<OrderModel> _newOrders = [
-    OrderModel(
-      orderNumber: "001",
-      priority: "Urgent",
-      startTime: "10:00 AM",
-      endTime: "12:00 PM",
-      customerName: "John Doe",
-      phoneNumber: "9876543210",
-      address: "123 Street, City",
-    ),
-    OrderModel(
-      orderNumber: "002",
-      priority: "Normal",
-      startTime: "2:00 PM",
-      endTime: "4:00 PM",
-      customerName: "Jane Smith",
-      phoneNumber: "8765432109",
-      address: "456 Avenue, City",
-    ),
-  ];
+  List<CustomerServiceOrder> _newOrders = [];
+  List<CustomerServiceOrder> _ongoingOrders = [];
 
-  final List<OrderModel> _ongoingOrders = [
-    OrderModel(
-      orderNumber: "101",
-      priority: "High",
-      startTime: "9:00 AM",
-      endTime: "11:00 AM",
-      customerName: "Alice Johnson",
-      phoneNumber: "7654321098",
-      address: "789 Boulevard, City",
-    ),
-    OrderModel(
-      orderNumber: "102",
-      priority: "Medium",
-      startTime: "3:00 PM",
-      endTime: "5:00 PM",
-      customerName: "Bob Williams",
-      phoneNumber: "6543210987",
-      address: "321 Lane, City",
-    ),
-  ];
+  List<CustomerServiceOrder> get newOrders => _newOrders;
+  List<CustomerServiceOrder> get ongoingOrders => _ongoingOrders;
 
-  String _searchQuery = "";
+  // 🔍 Search logic
+  String _searchQuery = '';
+  String get searchQuery => _searchQuery;
 
-  void updateSearchQuery(String query) {
-    _searchQuery = query;
-    notifyListeners();
+  // 🔍 Filtered results
+  List<CustomerServiceOrder> get filteredNewOrders {
+    if (_searchQuery.isEmpty) return _newOrders;
+    return _newOrders.where((order) => _matchesSearch(order)).toList();
   }
 
-  List<Order> get newServiceOrders =>
-      _newOrders
-          .where(
-            (order) =>
-                order.address.toLowerCase().contains(
-                  _searchQuery.toLowerCase(),
-                ) ||
-                order.orderNumber.contains(_searchQuery),
-          )
-          .map(
-            (order) => Order(
-              orderNumber: order.orderNumber,
-              priority: order.priority,
-              startTime: order.startTime,
-              endTime: order.endTime,
-              customerName: order.customerName,
-              phoneNumber: order.phoneNumber,
-              address: order.address,
-              isOngoing: false,
-            ),
-          )
-          .toList();
+  List<CustomerServiceOrder> get filteredOngoingOrders {
+    if (_searchQuery.isEmpty) return _ongoingOrders;
+    return _ongoingOrders.where((order) => _matchesSearch(order)).toList();
+  }
 
-  List<Order> get ongoingOrders =>
-      _ongoingOrders
-          .where(
-            (order) =>
-                order.address.toLowerCase().contains(
-                  _searchQuery.toLowerCase(),
-                ) ||
-                order.orderNumber.contains(_searchQuery),
-          )
-          .map(
-            (order) => Order(
-              orderNumber: order.orderNumber,
-              priority: order.priority,
-              startTime: order.startTime,
-              endTime: order.endTime,
-              customerName: order.customerName,
-              phoneNumber: order.phoneNumber,
-              address: order.address,
-              isOngoing: true,
-            ),
-          )
-          .toList();
+  bool _matchesSearch(CustomerServiceOrder order) {
+    final query = _searchQuery.toLowerCase();
+    return order.docNo.toLowerCase().contains(query) ||
+        order.customerName.toLowerCase().contains(query) ||
+        order.customerAddress.toLowerCase().contains(query) ||
+        order.contactNo.toLowerCase().contains(query);
+  }
+
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners(); // 🔁 Refresh filtered results
+  }
+
+  // 📡 API call
+  Future<void> fetchServiceOrdersFromAPI() async {
+    final response = await _networkService.getServiceOrders();
+
+    if (response == null || response.statusCode != 200) {
+      print("❌ Failed to fetch service orders");
+      return;
+    }
+
+    try {
+      final jsonString = response.data['value'];
+      final parsedJson = json.decode(jsonString);
+
+      List orders = parsedJson['results']['serviceman']['service_orders'];
+
+      _newOrders = [];
+      _ongoingOrders = [];
+
+      for (var order in orders) {
+        if (order['type'] == 'Customer Service') {
+          final parsed = CustomerServiceOrder.fromJson(order);
+
+          if (parsed.isNew) {
+            _newOrders.add(parsed);
+          } else {
+            _ongoingOrders.add(parsed);
+          }
+        }
+      }
+
+      notifyListeners();
+    } catch (e) {
+      print("❗ Error parsing service orders: $e");
+    }
+  }
 }

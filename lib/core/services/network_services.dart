@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class NetworkService {
   final Dio dio = Dio();
@@ -26,7 +27,7 @@ class NetworkService {
       );
 
       if (response.statusCode == 200) {
-        print("Access Token  : ${response.data['access_token']}");
+        print("✅ Access Token: ${response.data['access_token']}");
         return response.data['access_token'];
       } else {
         print(
@@ -45,6 +46,11 @@ class NetworkService {
     required String password,
     required String servicemanType,
   }) async {
+    print("🔐 Attempting login...");
+    print("👤 Username: $username");
+    print("🔑 Password: $password");
+    print("🛠️ Service Type: $servicemanType");
+
     final accessToken = await getAccessToken();
 
     if (accessToken == null) {
@@ -78,9 +84,107 @@ class NetworkService {
         data: jsonEncode(requestBody),
       );
 
+      print("📦 Login API Response (${response.statusCode}):");
+      print(response.data);
+
       return response;
     } catch (e) {
       print("❗ Dio exception during login request: $e");
+      return null;
+    }
+  }
+
+  Future<Response?> getServicemanData({
+    required String username,
+    required String servicemanType,
+  }) async {
+    final accessToken = await getAccessToken();
+
+    if (accessToken == null) {
+      print("❌ Cannot proceed without token");
+      return null;
+    }
+
+    final String url =
+        'https://api.businesscentral.dynamics.com/v2.0/$tenantId/SandboxDev/ODataV4/ServiceApp_GetServiceLogin?company=SEMBAS';
+
+    final requestBody = {
+      "servicelogin": jsonEncode({
+        "servicelogin": {
+          "username": username,
+          "serviceman_type": servicemanType,
+        },
+      }),
+    };
+
+    try {
+      final response = await dio.post(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+        data: jsonEncode(requestBody),
+      );
+
+      print("📦 GetServicemanData API Response (${response.statusCode}):");
+      print(response.data);
+
+      return response;
+    } catch (e) {
+      print("❗ Dio exception during serviceman data request: $e");
+      return null;
+    }
+  }
+
+  Future<Response?> getServiceOrders() async {
+    final accessToken = await getAccessToken();
+    final servicemanCode = Hive.box('userBox').get('servicemanCode') ?? "";
+
+    if (accessToken == null) {
+      print("❌ Missing access token");
+      return null;
+    }
+
+    if (servicemanCode.isEmpty) {
+      print("❌ Missing servicemanCode");
+      return null;
+    }
+
+    final url =
+        'https://api.businesscentral.dynamics.com/v2.0/3c6a50d8-d57d-4dc3-91cc-47759a72545e/SandboxDev/ODataV4/ServiceApp_GetServiceLogin?company=SEMBAS';
+
+    final requestBody = {
+      "servicelogin": jsonEncode({
+        "servicelogin": {
+          "username": servicemanCode,
+          "serviceman_type": "Serviceman",
+        },
+      }),
+    };
+
+    try {
+      final response = await dio.post(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+        data: jsonEncode(requestBody),
+      );
+
+      print("📦 Service Orders Response (${response.statusCode}):");
+      print(response.data);
+
+      return response;
+    } catch (e) {
+      print("❗ Dio exception while fetching service orders: $e");
       return null;
     }
   }
