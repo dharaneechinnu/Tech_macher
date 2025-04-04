@@ -1,14 +1,14 @@
 import 'package:dio/dio.dart';
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class NetworkService {
   final Dio dio = Dio();
 
-  final String clientId = '566bcdf9-5a5e-45ab-b1f1-0eab43b940a3';
-  final String clientSecret = 'Sat8Q~OAXtkmM2TS3TRfopCEUZaZIANtnJeDLb4f';
-  final String tenantId = '3c6a50d8-d57d-4dc3-91cc-47759a72545e';
-  final String scope = 'https://api.businesscentral.dynamics.com/.default';
-
+  final String clientId = dotenv.env['CLIENT_ID']!;
+  final String clientSecret = dotenv.env['CLIENT_SECRET']!;
+  final String tenantId = dotenv.env['TENANT_ID']!;
+  final String scope = dotenv.env['SCOPE']!;
   String get tokenUrl =>
       'https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token';
 
