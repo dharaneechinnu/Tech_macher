@@ -23,7 +23,8 @@ class _NewServiceOrdersState extends State<NewServiceOrders> {
 
   @override
   Widget build(BuildContext context) {
-    final orders = Provider.of<CustomerServiceProvider>(context).newOrders;
+    final orders =
+        Provider.of<CustomerServiceProvider>(context).filteredNewOrders;
 
     final userBox = Hive.box('userBox');
     final servicemanName = userBox.get(

@@ -4,26 +4,36 @@ class OrderDetailRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const OrderDetailRow({
-    super.key,
-    required this.label,
-    required this.value,
-  });
+  const OrderDetailRow({Key? key, required this.label, required this.value})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          SizedBox(
+            width: 100, // Fixed width for labels
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16.0,
+              ),
+            ),
           ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          const SizedBox(width: 12.0),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500,
+              ),
+              softWrap: true,
+            ),
           ),
         ],
       ),
